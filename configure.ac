@@ -190,12 +190,12 @@ dnl ----------------------------------------------------------------------------
 
 case $host_os in
     *freebsd* )
-	default_user="www"
-	default_group="www"
+	default_user="root"
+	default_group="wheel"
         ;;
     *linux* )
-	default_user="www-data"
-	default_group="www-data"
+	default_user="root"
+	default_group="root"
         ;;
 esac
 
