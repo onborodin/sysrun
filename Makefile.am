@@ -7,10 +7,10 @@ OBJEXT= none
 if LINUX_OS
 if SYSTEMD
 systemddir = /etc/systemd/system/
-nobase_systemd_DATA = sysrun.service
+nobase_systemd_DATA = syssrv.service
 else
 etcdir = @sysconfdir@
-nobase_etc_SCRIPTS = init.d/dbstore
+nobase_etc_SCRIPTS = init.d/syssrv
 
 endif
 endif
