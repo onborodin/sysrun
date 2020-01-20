@@ -29,6 +29,8 @@ syspwd_SOURCES = syspwd.go
 EXTRA_syspwd_SOURCES = \
 	config/config.go \
 	server/user-model/user_model.go
+	server/vm-controller/vm_controller.go \
+	server/vm-model/vm_model.go
 
 EXTRA_syssrv_SOURCES = \
 	config/config.go \
@@ -36,6 +38,8 @@ EXTRA_syssrv_SOURCES = \
 	server/server.go \
 	server/user-controller/user_controller.go \
 	server/user-model/user_model.go \
+	server/vm-controller/vm_controller.go \
+	server/vm-model/vm_model.go \
 	tools/file.go \
 	bundle/public.go
 
@@ -80,6 +84,10 @@ EXTRA_DIST = README.md public/ \
 	front/src/UserDelete.jsx \
 	front/src/Users.jsx \
 	front/src/UserUpdate.jsx \
+	\
+	front/src/Vms.jsx \
+	front/src/VmStart.jsx \
+	front/src/VmStop.jsx \
 	\
 	front/webpack.config.devel.js \
 	front/webpack.config.prod.js
