@@ -141,14 +141,16 @@ func (this *Server) Start() {
     }
 
     /* Change effective user ID */
-    err = syscall.Setuid(uid)
-    if err != nil {
-        log.Printf("set process user id error: %s\n", err)
-        os.Exit(1)
-    }
-    if syscall.Getuid() != uid {
-        log.Printf("set process user id error: %s\n", err)
-        os.Exit(1)
+    if uid != 0 {
+        err = syscall.Setuid(uid)
+        if err != nil {
+            log.Printf("set process user id error: %s\n", err)
+            os.Exit(1)
+        }
+        if syscall.Getuid() != uid {
+            log.Printf("set process user id error: %s\n", err)
+            os.Exit(1)
+        }
     }
 
     /* Redirect log to message file */
