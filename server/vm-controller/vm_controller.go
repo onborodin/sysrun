@@ -83,6 +83,12 @@ func (this *Controller) Start(context *gin.Context) {
         sendError(context, err)
         return
     }
+    err = this.vm.Start(vm.Id)
+    if err != nil {
+        sendError(context, err)
+        return
+    }
+
     sendOk(context)
 }
 
@@ -93,6 +99,12 @@ func (this *Controller) Stop(context *gin.Context) {
         sendError(context, err)
         return
     }
+    err = this.vm.Stop(vm.Id)
+    if err != nil {
+        sendError(context, err)
+        return
+    }
+
     sendOk(context)
 }
 
