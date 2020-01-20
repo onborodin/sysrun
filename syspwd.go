@@ -149,7 +149,7 @@ func main() {
             Username: *optAuthName,
             Password: *optAuthPass,
         }
-        err = user.Check(_user)
+        err = user.Check(&_user)
 
     } else if strings.HasPrefix(command, "lis") {
         _page := userModel.Page{
