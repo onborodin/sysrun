@@ -15,5 +15,6 @@ sysrun.service
 syssrv
 syspwd
 builder
+init.d/sysrun
 
 
