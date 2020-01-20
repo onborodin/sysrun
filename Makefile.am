@@ -6,7 +6,7 @@ OBJEXT= none
 
 if LINUX_OS
 if SYSTEMD
-systemddir = /etc/systemd/system/
+systemddir = /lib/systemd/system/
 nobase_systemd_DATA = syssrv.service
 else
 etcdir = @sysconfdir@
