@@ -65,6 +65,7 @@ func (this *Model) List() ([]VM, error) {
 
 func (this *Model) Stop(id int) error {
     out, err := exec.Command("qm", "stop", strconv.Itoa(id)).CombinedOutput()
+    log.Printf("start vm id=", strconv.Itoa(id), string(out))
     if err != nil {
         return errors.New(string(out))
     }
@@ -73,6 +74,7 @@ func (this *Model) Stop(id int) error {
 
 func (this *Model) Start(id int) error {
     out, err := exec.Command("qm", "start", strconv.Itoa(id)).CombinedOutput()
+    log.Printf("start vm id=", strconv.Itoa(id), string(out))
     if err != nil {
         return errors.New(string(out))
     }
