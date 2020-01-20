@@ -6,23 +6,80 @@ package vmModel
 
 import (
     "sysrun/config"
+    "log"
+    "os/exec"
+    "strings"
+    "regexp"
+    "strconv"
+    "errors"
 )
 
 type Model struct{
     config *config.Config
 }
 
-func (this *Model) List() {
+type VM struct {
+    Name    string      `json:"name"`
+    Id      int         `json:"id"`
+    Status  string      `json:"status"`
 }
 
-func (this *Model) Stop() {
+func (this *Model) List() ([]VM, error) {
+
+    out, err := exec.Command("qm", "list").Output()
+    if err != nil {
+        return nil, err
+    }
+
+    lines := strings.Split(string(out), "\n")
+
+    vms := []VM{}
+
+    for _, line := range lines {
+
+        rexp, err := regexp.Compile(`\s+`)
+        if err != nil {
+            log.Println(err)
+            return nil, err
+
+        }
+        res := rexp.Split(line, -1)
+        if len(res) < 3 {
+            continue
+        }
+
+        id, _ := strconv.Atoi(res[1])
+        if id == 0 {
+            continue
+        }
+
+        vm := VM{
+            Name : res[2],
+            Id : id,
+            Status : res[3],
+        }
+        vms = append(vms, vm)
+    }
+    return vms, err
 }
 
-func (this *Model) Start() {
+func (this *Model) Stop(id int) error {
+    out, err := exec.Command("qm", "stop", strconv.Itoa(id)). CombinedOutput()
+    if err != nil {
+        return errors.New(string(out))
+    }
+    return nil
 }
 
-func New(config *config.Config) *Model {
+func (this *Model) Start(id int) error {
+    out, err := exec.Command("qm", "start", strconv.Itoa(id)). CombinedOutput()
+    if err != nil {
+        return errors.New(string(out))
+    }
+    return nil
+}
+
+func New() *Model {
     return &Model{
-        config: config,
     }
 }

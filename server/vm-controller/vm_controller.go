@@ -50,7 +50,6 @@ func sendOk(context *gin.Context) {
 }
 
 func sendMessage(context *gin.Context, message string) {
-    log.Printf("%s\n", message)
     response := Response{
         Error: false,
         Message: fmt.Sprintf("%s", message),
@@ -69,20 +68,38 @@ func sendResult(context *gin.Context, result interface{}) {
 }
 
 func (this *Controller) List(context *gin.Context) {
-    sendOk(context)
+    vms, err := this.vm.List()
+    if err != nil {
+        sendError(context, err)
+        return
+    }
+    sendResult(context, vms)
 }
 
 func (this *Controller) Start(context *gin.Context) {
+    vm := vmModel.VM{}
+    err := context.Bind(&vm)
+    if err != nil {
+        sendError(context, err)
+        return
+    }
     sendOk(context)
 }
 
-func (this *Controller) Delete(context *gin.Context) {
+func (this *Controller) Stop(context *gin.Context) {
+    vm := vmModel.VM{}
+    err := context.Bind(&vm)
+    log.Println(vm)
+    if err != nil {
+        sendError(context, err)
+        return
+    }
     sendOk(context)
 }
 
 func New(config *config.Config) *Controller {
     return &Controller{
         config: config,
-        vm: vmModel.New(config),
+        vm: vmModel.New(),
     }
 }
