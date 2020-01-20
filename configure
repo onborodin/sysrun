@@ -2392,7 +2392,7 @@ else
   ac_cv_prog_HAVE_GO="$HAVE_GO" # Let the user override the test.
 else
 as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in /bin /usr/local/bin /usr/bin
+for as_dir in /bin /usr/local/bin /usr/bin /usr/local/go/bin
 do
   IFS=$as_save_IFS
   test -z "$as_dir" && as_dir=.

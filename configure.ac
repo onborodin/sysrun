@@ -4,7 +4,7 @@ AC_PREFIX_DEFAULT(/usr/local)
 
 PACKAGE=m2store
 
-AC_CHECK_PROG(HAVE_GO, go, true, false, /bin /usr/local/bin /usr/bin)
+AC_CHECK_PROG(HAVE_GO, go, true, false, /bin /usr/local/bin /usr/bin /usr/local/go/bin)
 if test "x$HAVE_GO" = "xfalse"; then
 	AC_MSG_ERROR([Requested program go not found])
 fi
