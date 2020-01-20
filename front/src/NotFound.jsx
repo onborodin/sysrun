@@ -18,7 +18,7 @@ export class NotFound extends Component {
     }
 
     componentDidMount() {
-        checkLogin()
+        checkLogin("user")
     }
 
 }

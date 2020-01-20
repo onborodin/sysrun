@@ -89,7 +89,6 @@ func (this *Controller) Start(context *gin.Context) {
 func (this *Controller) Stop(context *gin.Context) {
     vm := vmModel.VM{}
     err := context.Bind(&vm)
-    log.Println(vm)
     if err != nil {
         sendError(context, err)
         return

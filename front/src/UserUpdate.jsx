@@ -51,7 +51,6 @@ export class UserUpdate extends React.Component {
                 isadmin: this.state.isadmin
         }).then((res) => {
             if (res.data.error != null) {
-                console.log("user update response: ", res.data)
                 if (!res.data.error) {
                     this.hideForm()
                     this.props.updateCallback()
@@ -74,7 +73,6 @@ export class UserUpdate extends React.Component {
         if (!this.state.formIsValid) {
             return
         }
-        console.log("update user state:", this.state)
         this.updateUser()
     }
 

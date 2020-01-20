@@ -4,6 +4,17 @@ AUTOMAKE_OPTIONS = foreign no-dependencies no-installinfo
 SUFFIXES = .go .c
 OBJEXT= none
 
+if LINUX_OS
+if SYSTEMD
+systemddir = /etc/systemd/system/
+nobase_systemd_DATA = sysrun.service
+else
+etcdir = @sysconfdir@
+nobase_etc_SCRIPTS = init.d/dbstore
+
+endif
+endif
+
 EXTRA_PROGRAMS = builder
 builder_SOURCES = builder.go
 

@@ -345,5 +345,6 @@ AC_SUBST(app_daemonize, "$APP_DAEMONIZE")
 AC_OUTPUT([
 Makefile
 config/config.go
+syssrv.service
 ])
 dnl EOF

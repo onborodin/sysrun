@@ -24,7 +24,7 @@ export class Layout extends Component {
                     </div>
 
                     <div className="navbar-brand">
-                        <i className="fab fa-old-republic fa-lg"></i> G2
+                        <i className="fab fa-old-republic fa-lg"></i> SysRun
                     </div>
 
                     <ul className="nav justify-content-end ml-auto mr-3">

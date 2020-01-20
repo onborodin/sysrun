@@ -31,7 +31,6 @@ export class UserDelete extends Component {
                 id: this.props.userId,
         }).then((res) => {
             if (res.data.error != null) {
-                console.log("login: ", res.data)
                 if (!res.data.error) {
                     this.hideForm()
                     this.props.updateCallback()
@@ -55,7 +54,6 @@ export class UserDelete extends Component {
         if (!this.state.formIsValid) {
             return
         }
-        console.log("delete user:", this.state)
         this.deleteUser()
     }
 

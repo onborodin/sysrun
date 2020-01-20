@@ -16,7 +16,7 @@ import { decorate, observable, action } from "mobx"
 import NotFound from './NotFound'
 import Login from './Login'
 import Users from './Users'
-import Vm from './Vm'
+import Vms from './Vms'
 
 export const history = createBrowserHistory()
 
@@ -28,18 +28,16 @@ class Store {
 
     constructor() {
         this.username = ""
-        this.fileLimit = 10
-        this.filePattern = "*"
-        this.bucketLimit = 10
-        this.bucketPattern = "*"
+        this.isadmin = false
     }
 
-    @action login = (username) => {
-        console.log('login:', username)
+    @action login = (username, isadmin) => {
         this.username = username
+        this.isadmin = isadmin
     }
     @action logout = () => {
         this.username = ""
+        this.isadmin = false
         Cookies.remove(cookieName)
         history.push("/login")
     }
@@ -47,11 +45,13 @@ class Store {
 
 export const store = new Store()
 
-export function checkLogin() {
-    console.log("check login")
+export function checkLogin(accessLevel) {
     let cookie = Cookies.get(cookieName)
     if (store.username == "" || cookie == null) {
-        //history.push("/login")
+        history.push("/login")
+    }
+    if (accessLevel == "admin" && store.isadmin == false) {
+        history.push("/login")
     }
 }
 
@@ -60,7 +60,7 @@ ReactDOM.render(
         <Switch>
             <Route exact path="/login" component={Login} />
             <Route exact path="/users" component={Users} />
-            <Route exact path="/" component={Vm} />
+            <Route exact path="/" component={Vms} />
             <Route path="*" component={NotFound} />
         </Switch>
     </Router>,

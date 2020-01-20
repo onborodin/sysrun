@@ -33,7 +33,6 @@ export class UserCreate extends React.Component {
                 isadmin: this.state.isadmin
         }).then((res) => {
             if (res.data.error != null) {
-                console.log("create: ", res.data)
                 if (!res.data.error) {
                     this.hideForm()
                     this.clearForm()
@@ -66,7 +65,6 @@ export class UserCreate extends React.Component {
             return
         }
         this.createUser()
-        console.log("new user:", this.state)
     }
 
     validateUsername() {

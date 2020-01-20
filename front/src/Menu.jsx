@@ -12,7 +12,7 @@ export class Menu extends Component {
                 <div className="mb-2">
                     <div className="dropdown-divider"></div>
                     <div className="dropdown-item active"><i className="fas fa-hammer"></i> Menu </div>
-
+                    <Link className="dropdown-item" to="/"><i className="fas fa-play"></i> VMs </Link>
                     <Link className="dropdown-item" to="/users"><i className="fas fa-users"></i> Users </Link>
 
                     <div className="dropdown-divider mb-3"></div>

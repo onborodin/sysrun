@@ -1,0 +1,13 @@
+[Unit]
+Description=syssrv
+
+[Service]
+Type=forking
+PIDFile=/home/ziggi/sysrun/run/syssrv.pid
+ExecStart=/usr/local/sbin/syssrv
+ExecReload=/bin/kill -HUP $MAINPID
+ExecStartPre=/usr/bin/install -d -o ziggi -g wheel /home/ziggi/sysrun/run /home/ziggi/sysrun/log
+
+[Install]
+WantedBy=multi-user.target
+

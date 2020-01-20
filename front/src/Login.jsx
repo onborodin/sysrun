@@ -5,7 +5,7 @@ import { debounce, throttle, trim } from 'lodash'
 
 import { store } from './main'
 
-@autobind
+
 export class Login extends React.Component {
 
     constructor(props) {
@@ -19,16 +19,16 @@ export class Login extends React.Component {
         }
     }
 
+    @autobind
     checkLogin() {
         axios.post('/api/v2/user/login', {
                 username: this.state.username,
                 password: this.state.password
         }).then((res) => {
             if (res.data.error != null) {
-                console.log("login: ", res.data)
                 if (!res.data.error) {
                     this.setState({alertMessage: ""})
-                    store.login(this.state.username)
+                    store.login(res.data.result.username, res.data.result.isadmin)
                     this.props.history.push('/')
                 } else {
                     this.setState({
@@ -40,12 +40,14 @@ export class Login extends React.Component {
         })
     }
 
+    @autobind
     onSubmit(event) {
         event.preventDefault()
         //let checkLogin = debounce(this.checkLogin, 1000)
-        this.checkLogin()
+        this.checkLogin("user")
     }
 
+    @autobind
     onChangeUsername(event) {
         event.preventDefault()
         const newUsername = trim(event.target.value)
@@ -55,6 +57,7 @@ export class Login extends React.Component {
         })
     }
 
+    @autobind
     onChangePassword(event) {
         event.preventDefault()
         const newPassword = trim(event.target.value)
@@ -69,6 +72,7 @@ export class Login extends React.Component {
         }
     }
 
+    @autobind
     render() {
         return (
             <Fragment>
@@ -80,7 +84,7 @@ export class Login extends React.Component {
                     </button>
 
                     <div className="navbar-brand">
-                        <i className="fab fa-old-republic fa-lg"></i> G2
+                        <i className="fab fa-old-republic fa-lg"></i> Login
                     </div>
 
                 </nav>
@@ -88,7 +92,7 @@ export class Login extends React.Component {
 
                 <div className="container-fluid">
                     <div className="row justify-content-center">
-                        <div className="col-8 col-sm-6 col-md-4 border p-4 mt-sm-5 ml-3 mr-3">
+                        <div className="col-8 col-sm-6 col-md-4 border p-4 mt-5 ml-3 mr-3">
 
                             <form onSubmit={this.onSubmit}>
                                 <div className="form-group">

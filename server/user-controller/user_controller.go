@@ -73,15 +73,12 @@ func sendResult(context *gin.Context, result interface{}) {
     context.JSON(http.StatusOK, &response)
 }
 
-
 func (this *UserController) List(context *gin.Context) {
     var page userModel.Page
     _ = context.Bind(&page)
     this.user.List(&page)
     sendResult(context, &page)
 }
-
-
 
 func (this *UserController) Create(context *gin.Context) {
     var user userModel.User
@@ -153,7 +150,7 @@ func (this *UserController) Login(context *gin.Context) {
         return
     }
 
-    err = this.user.Check(user)
+    err = this.user.Check(&user)
     if err != nil {
         sendError(context, err)
         return
@@ -163,9 +160,9 @@ func (this *UserController) Login(context *gin.Context) {
     session.Set("username", user.Username)
     session.Save()
 
-    var list []userModel.User
-    list = append(list, user)
-    sendResult(context, &list)
+    //var list []userModel.User
+    //list = append(list, user)
+    sendResult(context, &user)
 }
 
 func (this *UserController) Logout(context *gin.Context) {

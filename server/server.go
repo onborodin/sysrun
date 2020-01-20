@@ -11,7 +11,7 @@ import (
     "errors"
     "flag"
     "fmt"
-    //"html/template"
+    "html/template"
     "io"
     "io/ioutil"
     "log"
@@ -35,6 +35,7 @@ import (
 
     "sysrun/server/user-model"
     "sysrun/server/user-controller"
+    "sysrun/server/vm-controller"
 
     "sysrun/daemon"
     "sysrun/config"
@@ -65,6 +66,7 @@ func (this *Server) Start() {
 
     optPort := flag.Int("port", this.Config.Port, "listen port")
     optDebug := flag.Bool("debug", this.Config.Debug, "debug mode")
+    optDevel := flag.Bool("devel", this.Config.Devel, "devel mode")
 
     exeName := filepath.Base(os.Args[0])
 
@@ -79,7 +81,7 @@ func (this *Server) Start() {
 
     this.Config.Port = *optPort
     this.Config.Debug = *optDebug
-
+    this.Config.Devel = *optDevel
 
     /* Daemonize process */
     if !*optForeground {
@@ -227,17 +229,24 @@ func (this *Server) Run() error {
     router.MaxMultipartMemory = 1*1024*1024
 
     /* Read templates */
-    router.LoadHTMLGlob(filepath.Join(this.Config.LibDir, "public/index.html"))
+    if this.Config.Devel {
+        router.LoadHTMLGlob(filepath.Join(this.Config.LibDir, "public/index.html"))
+    } else {
+        data, err := ioutil.ReadAll(this.files["/public/index.html"])
+        if err != nil {
+            return err
+        }
+        tmpl, err := template.New("index.html").Parse(string(data))
+        router.SetHTMLTemplate(tmpl)
+    }
 
-    //data, err := ioutil.ReadAll(this.files["/public/index.html"])
-    //if err != nil {
-        //return err
-    //}
-    //tmpl, err := template.New("index.html").Parse(string(data))
-    //router.SetHTMLTemplate(tmpl)
+    store := cookie.NewStore([]byte("ds79asd9a7d9sa7d9sa87d"))
 
+    store.Options(sessions.Options{
+        MaxAge: 3600 * 4,
+        Path:   "/",
+    })
 
-    store := cookie.NewStore([]byte("secret"))
     router.Use(sessions.Sessions("session", store))
 
     router.GET("/", this.Index)
@@ -248,15 +257,20 @@ func (this *Server) Run() error {
     router.POST("/api/v2/user/logout", userController.Logout)
 
     humanGroup := router.Group("/api/v2")
-    //humanGroup.Use(this.sessionAuthMiddleware)
+    humanGroup.Use(this.sessionAuthMiddleware)
 
     humanGroup.POST("/user/list", userController.List)
     humanGroup.POST("/user/create", userController.Create)
     humanGroup.POST("/user/delete", userController.Delete)
     humanGroup.POST("/user/update", userController.Update)
 
-    //botGroup := router.Group("/api/v1")
-    //botGroup.Use(this.uniAuthMiddleware)
+    botGroup := router.Group("/api/v1")
+    botGroup.Use(this.uniAuthMiddleware)
+
+    vmController := vmController.New(this.Config)
+    botGroup.GET("/vm/list", vmController.List)
+    botGroup.POST("/vm/start", vmController.Start)
+    botGroup.POST("/vm/stop", vmController.Stop)
 
     router.NoRoute(this.NoRoute)
 
@@ -273,41 +287,43 @@ func (this *Server) NoRoute(context *gin.Context) {
 
     requestPath := context.Request.URL.Path
 
-    /* Filesystem assets, Validate file name */
-    publicDir := filepath.Join(this.Config.LibDir, "public")
-    filePath := filepath.Clean(filepath.Join(publicDir, requestPath))
-    if !strings.HasPrefix(filePath, publicDir) {
-        err := errors.New(fmt.Sprintf("wrong file patch %s\n", filePath))
-        log.Println(err)
-        context.HTML(http.StatusOK, "index.html", nil)
-        return
+    if this.Config.Devel {
+        /* Filesystem assets, Validate file name */
+        publicDir := filepath.Join(this.Config.LibDir, "public")
+        filePath := filepath.Clean(filepath.Join(publicDir, requestPath))
+        if !strings.HasPrefix(filePath, publicDir) {
+            err := errors.New(fmt.Sprintf("wrong file patch %s\n", filePath))
+            log.Println(err)
+            context.HTML(http.StatusOK, "index.html", nil)
+            return
+        }
+
+        /* for frontend handle: If file not found send index.html */
+        if !tools.FileExists(filePath) {
+            err := errors.New(fmt.Sprintf("file path not found %s\n", filePath))
+            log.Println(err)
+            context.HTML(http.StatusOK, "index.html", nil)
+            return
+        }
+        context.File(filePath)
+    } else {
+        /* Embeded assests */
+        var err error
+        file := this.files[filepath.Join("/public", requestPath)] //io.Reader
+        if file == nil {
+            context.HTML(http.StatusOK, "index.html", nil)
+            return
+        }
+
+        data, err := ioutil.ReadAll(file)
+        if err != nil {
+            log.Println(err)
+            context.HTML(http.StatusOK, "index.html", nil)
+            return
+        }
+        modTime := file.ModTime()
+        http.ServeContent(context.Writer, context.Request, requestPath, modTime, bytes.NewReader(data))
     }
-
-    /* for frontend handle: If file not found send index.html */
-    if !tools.FileExists(filePath) {
-        err := errors.New(fmt.Sprintf("file path not found %s\n", filePath))
-        log.Println(err)
-        context.HTML(http.StatusOK, "index.html", nil)
-        return
-    }
-    context.File(filePath)
-
-    /* Embeded assests */
-    //var err error
-    //file := this.files[filepath.Join("/public", requestPath)] //io.Reader
-    //if file == nil {
-        //context.HTML(http.StatusOK, "index.html", nil)
-        //return
-    //}
-
-    //data, err := ioutil.ReadAll(file)
-    //if err != nil {
-        //log.Println(err)
-        //context.HTML(http.StatusOK, "index.html", nil)
-        //return
-    //}
-    //modTime := file.ModTime()
-    //http.ServeContent(context.Writer, context.Request, requestPath, modTime, bytes.NewReader(data))
 }
 
 func logFormatter() func(param gin.LogFormatterParams) string {
@@ -421,7 +437,7 @@ func (this *Server) authenticateUser(username string, password string) bool {
         Username: username,
         Password: password,
     }
-    err := user.Check(theUser)
+    err := user.Check(&theUser)
     if err != nil {
         log.Printf("autentification error: %s", err)
         return false

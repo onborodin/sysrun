@@ -20,6 +20,7 @@ type Config struct {
     AccessLogPath       string  `yaml:"accesslog"`
     Port                int     `yaml:"port"`
     Debug               bool    `yaml:"debug"`
+    Devel               bool    `yaml:"-"`
     StoreDir            string  `yaml:"storedir"`
     User                string  `yaml:"user"`
     Group               string  `yaml:"group"`
@@ -74,6 +75,7 @@ func New() *Config {
         AccessLogPath:  "/home/ziggi/sysrun/log/access.log",
         Port:           8080,
         Debug:          false,
+        Devel:          false,
         StoreDir:       "/home/ziggi/sysrun/data",
         User:           "ziggi",
         Group:          "wheel",
@@ -86,4 +88,3 @@ func New() *Config {
         DbPass:         "password",
     }
 }
-

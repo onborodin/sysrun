@@ -33,10 +33,14 @@ export class Users extends Component {
                 offset: this.state.offset
         }).then((res) => {
             if (res.data.error != null) {
-                console.log("list users response: ", res.data)
+                let users = []
+                if (res.data.result.users != null) {
+                    users = res.data.result.users
+                }
+
                 if (!res.data.error) {
                     this.setState({
-                        users: res.data.result.users,
+                        users: users,
                         total: res.data.result.total,
                         offset: res.data.result.offset,
                         limit: res.data.result.limit
@@ -52,11 +56,6 @@ export class Users extends Component {
                 alertMessage: "Communication error"
             })
         })
-    }
-
-    @autobind
-    hello() {
-        console.log("hi!")
     }
 
     showAlert() {
@@ -168,7 +167,7 @@ export class Users extends Component {
     }
 
     componentDidMount() {
-        checkLogin()
+        checkLogin("admin")
         this.listUsers()
     }
 }

@@ -28,7 +28,7 @@ type User struct {
     Id          int     `db:"id"        json:"id"`
     Username    string  `db:"username"  json:"username"`
     Password    string  `db:"password"  json:"password,omitempty"`
-    IsAdmin     bool    `db:"isadmin"   json:"isadmin,omitempty"`
+    IsAdmin     bool    `db:"isadmin"   json:"isadmin"`
     Limit       int     `db:"-"         json:"limit,omitempty"`
     Offset      int     `db:"-"         json:"offset,omitempty"`
 }
@@ -120,9 +120,11 @@ func (this *Model) Update(user User) error {
     return nil
 }
 
-func (this *Model) Check(user User) error {
+func (this *Model) Check(user *User) error {
+    username := user.Username
+    password := user.Password
     request := `SELECT * FROM users WHERE username = $1 and password = $2 LIMIT 1`
-    err := this.db.Get(&user, request, user.Username, user.Password)
+    err := this.db.Get(user, request, username, password)
     if err != nil {
         log.Println(err)
     }

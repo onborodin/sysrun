@@ -11,6 +11,7 @@ log/
 run/
 Makefile
 config.status
+sysrun.service
 syssrv
 syspwd
 builder
