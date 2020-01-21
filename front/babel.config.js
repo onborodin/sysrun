@@ -1,6 +1,11 @@
 
+{
+  "presets": [["@babel/preset-env", { "loose": true, "modules": "commonjs" }]]
+}
+
+
 const presets = [
-    "@babel/preset-env",
+    ["@babel/preset-env", { "loose": true, "modules": "commonjs" }]
     "@babel/preset-react"
 ];
 

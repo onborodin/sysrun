@@ -10,9 +10,11 @@ const TerserJSPlugin = require('terser-webpack-plugin')
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin')
 
 const HardSourceWebpackPlugin = require('hard-source-webpack-plugin')
+const ES3Plugin = require("webpack-es3-plugin")
+
 
 module.exports = {
-    //mode: 'development',
+    mode: 'production',
     entry: path.join(__dirname, "src/main.jsx"),
     output: {
         filename: "bundle.[contenthash:6].js",
@@ -93,6 +95,7 @@ module.exports = {
     },
     plugins: [
         //new HardSourceWebpackPlugin(),
+        new ES3Plugin(),
         new CleanWebpackPlugin(),
         new webpack.ProgressPlugin(),
         new HtmlWebpackPlugin({
