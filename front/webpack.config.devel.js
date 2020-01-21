@@ -15,7 +15,7 @@ module.exports = {
     //mode: 'development',
     entry: path.join(__dirname, "src/main.jsx"),
     output: {
-        filename: "bundle.[contenthash:6].js",
+        filename: "bundle.[contenthash:12].js",
         path: path.join(__dirname, "../public/"),
         publicPath: '/'
     },
@@ -100,7 +100,7 @@ module.exports = {
             base: "/"
         }),
         new MiniCssExtractPlugin({
-            filename: "bundle.[contenthash:6].css",
+            filename: "bundle.[contenthash:12].css",
         }),
         new CopyPlugin([
             { from: 'public', to: '' },
