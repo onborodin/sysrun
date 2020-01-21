@@ -23,6 +23,7 @@ import (
     "strings"
     "syscall"
     "time"
+    "crypto/tls"
 
     "github.com/gin-gonic/gin"
     "github.com/gin-contrib/sessions"
@@ -277,8 +278,19 @@ func (this *Server) Run() error {
 
     router.NoRoute(this.NoRoute)
 
-    router.RunTLS(":" + fmt.Sprintf("%d", this.Config.Port), this.Config.CertPath, this.Config.KeyPath)
-    return nil
+    tlsConfig := &tls.Config{
+        InsecureSkipVerify: true,
+
+    }
+    server := &http.Server{
+        Addr:         fmt.Sprintf(":%d", this.Config.Port),
+        Handler:      router,
+        TLSConfig:    tlsConfig,
+    }
+    err = server.ListenAndServeTLS(this.Config.CertPath, this.Config.KeyPath)
+
+    //router.RunTLS(":" + fmt.Sprintf("%d", this.Config.Port), this.Config.CertPath, this.Config.KeyPath)
+    return err
 }
 
 func (this *Server) Index(context *gin.Context) {
