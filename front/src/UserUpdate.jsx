@@ -196,7 +196,7 @@ export class UserUpdate extends React.Component {
 
                                     <div className="form-group">
                                         <label htmlFor={this.makeId("password")}>Password:</label>
-                                        <input id={this.makeId("password")} type="text" className="form-control"
+                                        <input id={this.makeId("password")} type="password" className="form-control"
                                                     value={this.state.password} onChange={this.onChangePassword}/>
                                         <small className="form-text text-muted">{this.state.passwordMessage}</small>
                                     </div>
