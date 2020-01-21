@@ -108,6 +108,23 @@ func (this *Controller) Stop(context *gin.Context) {
     sendOk(context)
 }
 
+func (this *Controller) Shutdown(context *gin.Context) {
+    vm := vmModel.VM{}
+    err := context.Bind(&vm)
+    if err != nil {
+        sendError(context, err)
+        return
+    }
+    err = this.vm.Shutdown(vm.Id)
+    if err != nil {
+        sendError(context, err)
+        return
+    }
+
+    sendOk(context)
+}
+
+
 func New(config *config.Config) *Controller {
     return &Controller{
         config: config,

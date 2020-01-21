@@ -72,6 +72,15 @@ func (this *Model) Stop(id int) error {
     return nil
 }
 
+func (this *Model) Shutdown(id int) error {
+    out, err := exec.Command("qm", "shutdown", strconv.Itoa(id)).CombinedOutput()
+    log.Println("stop vm id=", strconv.Itoa(id), string(out))
+    if err != nil {
+        return errors.New(string(out))
+    }
+    return nil
+}
+
 func (this *Model) Start(id int) error {
     out, err := exec.Command("qm", "start", strconv.Itoa(id)).CombinedOutput()
     log.Println("start vm id=", strconv.Itoa(id), string(out))

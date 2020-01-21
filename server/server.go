@@ -273,6 +273,7 @@ func (this *Server) Run() error {
     botGroup.GET("/vm/list", vmController.List)
     botGroup.POST("/vm/start", vmController.Start)
     botGroup.POST("/vm/stop", vmController.Stop)
+    botGroup.POST("/vm/shutdown", vmController.Shutdown)
 
     router.NoRoute(this.NoRoute)
 

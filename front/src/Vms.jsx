@@ -9,6 +9,7 @@ import { checkLogin } from './main'
 
 import { VmStart } from './VmStart'
 import { VmStop } from './VmStop'
+import { VmShutdown } from './VmShutdown'
 
 import { Pager } from './Pager'
 
@@ -62,10 +63,11 @@ export class Vms extends Component {
             const theVm = vm
             return (
                 <tr key={id}>
-                    <td>{index}</td>
+                    <td>{id}</td>
                     <td>{name}</td>
                     <td>{status}</td>
                     <td><VmStart vmId={id} vm={theVm} startCallback={this.listVms} /></td>
+                    <td><VmShutdown vmId={id} vm={theVm} shutdownCallback={this.listVms} /></td>
                     <td><VmStop vmId={id} vm={theVm} stopCallback={this.listVms} /></td>
                 </tr>
             )
@@ -99,10 +101,14 @@ export class Vms extends Component {
                                 <th>status</th>
 
                                 <th>
-                                    start
+                                    <i className="fas fa-play"></i>
                                 </th>
                                 <th>
-                                    stop
+                                    <i className="fas fa-power-off"></i>
+                                </th>
+
+                                <th>
+                                    <i className="fas fa-stop"></i>
                                 </th>
                             </tr>
                         </thead>
