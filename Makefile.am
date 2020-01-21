@@ -6,7 +6,7 @@ OBJEXT= none
 
 if LINUX_OS
 if SYSTEMD
-systemddir = /lib/systemd/system/
+systemddir = /lib/systemd/system
 nobase_systemd_DATA = syssrv.service
 else
 etcdir = @sysconfdir@
@@ -28,7 +28,7 @@ syspwd_SOURCES = syspwd.go
 
 EXTRA_syspwd_SOURCES = \
 	config/config.go \
-	server/user-model/user_model.go
+	server/user-model/user_model.go \
 	server/vm-controller/vm_controller.go \
 	server/vm-model/vm_model.go
 
@@ -103,5 +103,5 @@ install-data-local:
 	test -z $(DESTDIR)$(APP_LOGDIR) || $(MKDIR_P) $(DESTDIR)$(APP_LOGDIR)
 	test -z $(DESTDIR)$(APP_RUNDIR) || $(MKDIR_P) $(DESTDIR)$(APP_RUNDIR)
 #	test -z $(DESTDIR)$(APP_CACHEDIR) || $(MKDIR_P) $(DESTDIR)$(APP_CACHEDIR)
-	test -z $(DESTDIR)$(APP_DATABASEDIR) || $(MKDIR_P) $(DESTDIR)$(APP_DATABASEDIR)
+#	test -z $(DESTDIR)$(APP_DATABASEDIR) || $(MKDIR_P) $(DESTDIR)$(APP_DATABASEDIR)
 #EOF

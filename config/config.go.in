@@ -67,9 +67,9 @@ func (this *Config) GetStoreDir() (string, error) {
 
 func New() *Config {
     return &Config{
-        ConfigPath:     "@app_confdir@syssrv.yml",
+        ConfigPath:     "@app_confdir@/syssrv.yml",
         LibDir:         "@app_libdir@",
-        PasswordPath:   "@app_confdir@syspwd.db",
+        PasswordPath:   "@app_confdir@/syspwd.db",
         PidPath:        "@app_rundir@/syssrv.pid",
         MessageLogPath: "@app_logdir@/message.log",
         AccessLogPath:  "@app_logdir@/access.log",
