@@ -11,7 +11,7 @@ import (
     "errors"
     "flag"
     "fmt"
-    "html/template"
+    //"html/template"
     "io"
     "io/ioutil"
     "log"
@@ -23,7 +23,7 @@ import (
     "strings"
     "syscall"
     "time"
-    "crypto/tls"
+    //"crypto/tls"
 
     "github.com/gin-gonic/gin"
     "github.com/gin-contrib/sessions"
@@ -235,16 +235,16 @@ func (this *Server) Run() error {
     router.MaxMultipartMemory = 1*1024*1024
 
     /* Read templates */
-    if this.Config.Devel {
+    //if this.Config.Devel {
         router.LoadHTMLGlob(filepath.Join(this.Config.LibDir, "public/index.html"))
-    } else {
-        data, err := ioutil.ReadAll(this.files["/public/index.html"])
-        if err != nil {
-            return err
-        }
-        tmpl, err := template.New("index.html").Parse(string(data))
-        router.SetHTMLTemplate(tmpl)
-    }
+    //} else {
+    //    data, err := ioutil.ReadAll(this.files["/public/index.html"])
+    //    if err != nil {
+    //        return err
+    //    }
+    //    tmpl, err := template.New("index.html").Parse(string(data))
+    //    router.SetHTMLTemplate(tmpl)
+    //}
 
     store := cookie.NewStore([]byte("ds79asd9a7d9sa7d9sa87d"))
 
@@ -281,18 +281,17 @@ func (this *Server) Run() error {
 
     router.NoRoute(this.NoRoute)
 
-    tlsConfig := &tls.Config{
-        InsecureSkipVerify: true,
+    //tlsConfig := &tls.Config{
+    //    InsecureSkipVerify: true,
+    //}
+    //server := &http.Server{
+    //    Addr:         fmt.Sprintf(":%d", this.Config.Port),
+    //    Handler:      router,
+    //    TLSConfig:    tlsConfig,
+    //}
+    //err = server.ListenAndServeTLS(this.Config.CertPath, this.Config.KeyPath)
 
-    }
-    server := &http.Server{
-        Addr:         fmt.Sprintf(":%d", this.Config.Port),
-        Handler:      router,
-        TLSConfig:    tlsConfig,
-    }
-    err = server.ListenAndServeTLS(this.Config.CertPath, this.Config.KeyPath)
-
-    //router.RunTLS(":" + fmt.Sprintf("%d", this.Config.Port), this.Config.CertPath, this.Config.KeyPath)
+    err = router.RunTLS(":" + fmt.Sprintf("%d", this.Config.Port), this.Config.CertPath, this.Config.KeyPath)
     return err
 }
 
@@ -305,7 +304,7 @@ func (this *Server) NoRoute(context *gin.Context) {
 
     requestPath := context.Request.URL.Path
 
-    if this.Config.Devel {
+    //if this.Config.Devel {
         /* Filesystem assets, Validate file name */
         publicDir := filepath.Join(this.Config.LibDir, "public")
         filePath := filepath.Clean(filepath.Join(publicDir, requestPath))
@@ -324,24 +323,23 @@ func (this *Server) NoRoute(context *gin.Context) {
             return
         }
         context.File(filePath)
-    } else {
-        /* Embeded assests */
-        var err error
-        file := this.files[filepath.Join("/public", requestPath)] //io.Reader
-        if file == nil {
-            context.HTML(http.StatusOK, "index.html", nil)
-            return
-        }
-
-        data, err := ioutil.ReadAll(file)
-        if err != nil {
-            log.Println(err)
-            context.HTML(http.StatusOK, "index.html", nil)
-            return
-        }
-        modTime := file.ModTime()
-        http.ServeContent(context.Writer, context.Request, requestPath, modTime, bytes.NewReader(data))
-    }
+    //} else {
+    //    /* Embeded assests */
+    //    var err error
+    //    file := this.files[filepath.Join("/public", requestPath)] //io.Reader
+    //    if file == nil {
+    //        context.HTML(http.StatusOK, "index.html", nil)
+    //        return
+    //    }
+    //    data, err := ioutil.ReadAll(file)
+    //    if err != nil {
+    //        log.Println(err)
+    //        context.HTML(http.StatusOK, "index.html", nil)
+    //        return
+    //    }
+    //    modTime := file.ModTime()
+    //    http.ServeContent(context.Writer, context.Request, requestPath, modTime, bytes.NewReader(data))
+    //}
 }
 
 func logFormatter() func(param gin.LogFormatterParams) string {

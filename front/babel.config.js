@@ -1,6 +1,6 @@
 
 const presets = [
-    [ "@babel/preset-env", { "loose": true, "modules": "commonjs" } ],
+    [ "@babel/preset-env", { "modules": "commonjs" } ],
     "@babel/preset-react"
 ];
 
