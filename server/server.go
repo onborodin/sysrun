@@ -28,7 +28,7 @@ import (
     "github.com/gin-gonic/gin"
     "github.com/gin-contrib/sessions"
     "github.com/gin-contrib/sessions/cookie"
-    //"github.com/gin-contrib/gzip"
+    "github.com/gin-contrib/gzip"
 
     "github.com/jmoiron/sqlx"
     _ "github.com/mattn/go-sqlite3"
@@ -230,7 +230,7 @@ func (this *Server) Run() error {
     router.Use(gin.LoggerWithFormatter(logFormatter()))
     router.Use(gin.Recovery())
     //if !this.Config.Devel && !this.Config.Debug {
-    //    router.Use(gzip.Gzip(gzip.DefaultCompression))
+        router.Use(gzip.Gzip(gzip.DefaultCompression))
     //}
     //router.MaxMultipartMemory = 1*1024*1024
 
