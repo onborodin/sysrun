@@ -10,6 +10,7 @@ import (
     "sysrun/server/user-model"
     "sysrun/config"
     "encoding/json"
+    "errors"
 
     "github.com/jmoiron/sqlx"
     _ "github.com/mattn/go-sqlite3"
@@ -101,13 +102,16 @@ func main() {
 
         updateCommands.Parse(localArgs)
 
-        _user := userModel.User{
-            Username: *optUpdateName,
-            Password: *optUpdatePass,
-            IsAdmin:  *optUpdateAdmin,
+        if len(*optUpdateName) < 5 || len(*optUpdatePass) < 5 {
+            err = errors.New("username or passwotrd is less 5 chars")
+        } else {
+            _user := userModel.User{
+                Username: *optUpdateName,
+                Password: *optUpdatePass,
+                IsAdmin:  *optUpdateAdmin,
+            }
+            err = user.Create(_user)
         }
-
-        err = user.Create(_user)
 
     } else if strings.HasPrefix(command, "upd") {
 
@@ -160,6 +164,8 @@ func main() {
         for _, item := range *_page.Users {
             printUser(item)
         }
+    } else {
+        flag.Usage()
     }
 
     if err != nil {

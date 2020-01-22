@@ -11,7 +11,26 @@ import (
     "strings"
     "io/ioutil"
     "errors"
+
+    "math/rand"
+
+    "github.com/GehirnInc/crypt"
+    _ "github.com/GehirnInc/crypt/sha256_crypt"
 )
+
+func randString(n int) string {
+    const letters = "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    arr := make([]byte, n)
+    for i := range arr {
+        arr[i] = letters[rand.Intn(len(letters))]
+    }
+    return string(arr)
+}
+
+func createHash(key string) (string, error) {
+    crypt := crypt.SHA256.New()
+    return crypt.Generate([]byte(key), []byte("$5$" + randString(12)))
+}
 
 /* Return true if file exists and not directory */
 func FileExists(name string) bool {

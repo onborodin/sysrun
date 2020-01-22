@@ -3,6 +3,8 @@ module sysrun
 go 1.13
 
 require (
+	github.com/GehirnInc/crypt v0.0.0-20190301055215-6c0105aabd46
+	github.com/gin-contrib/gzip v0.0.1
 	github.com/gin-contrib/pprof v1.2.1
 	github.com/gin-contrib/sessions v0.0.3
 	github.com/gin-gonic/gin v1.5.0

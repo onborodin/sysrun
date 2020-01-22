@@ -77,7 +77,7 @@ func New() *Config {
         Debug:          false,
         Devel:          false,
         StoreDir:       "/home/ziggi/sysrun/data",
-        User:           "root",
+        User:           "ziggi",
         Group:          "wheel",
         CertPath:       "/home/ziggi/sysrun//syssrv.crt",
         KeyPath:        "/home/ziggi/sysrun//syssrv.key",

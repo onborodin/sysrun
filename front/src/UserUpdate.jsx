@@ -12,7 +12,7 @@ export class UserUpdate extends React.Component {
             prevUsername: this.props.user.username,
             id: this.props.user.id,
             username: this.props.user.username,
-            password: this.props.user.password,
+            password: "",
             isadmin: this.props.user.isadmin,
             usernameIsValid: false,
             passwordIsValid: false,
@@ -95,7 +95,7 @@ export class UserUpdate extends React.Component {
     }
 
     validatePassword() {
-        if (this.state.password.length > this.minPasswordLength) {
+        if (this.state.password.length > this.minPasswordLength || this.state.password.length == 0) {
             this.setState({
                     passwordIsValid: true,
                     passwordMessage: ""

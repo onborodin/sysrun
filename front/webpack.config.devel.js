@@ -12,7 +12,7 @@ const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin')
 const HardSourceWebpackPlugin = require('hard-source-webpack-plugin')
 
 module.exports = {
-    //mode: 'development',
+    mode: 'development',
     entry: path.join(__dirname, "src/main.jsx"),
     output: {
         filename: "bundle.[contenthash:12].js",
@@ -29,7 +29,7 @@ module.exports = {
 
     devtool: 'inline-source-map',
     watchOptions: {
-        ignored: ['node_modules'],
+        ignored: [ 'node_modules' ],
         aggregateTimeout: 500,
         poll: 1000
     },
