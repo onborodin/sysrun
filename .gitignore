@@ -11,10 +11,9 @@ log/
 run/
 Makefile
 config.status
-sysrun.service
 syssrv
 syspwd
 builder
 init.d/sysrun
-
+syssrv.service
 

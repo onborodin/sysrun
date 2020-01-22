@@ -15,9 +15,9 @@ const HardSourceWebpackPlugin = require('hard-source-webpack-plugin')
 
 module.exports = {
     mode: 'production',
-    optimization: {
-        minimize: false
-    },
+    //optimization: {
+    //    minimize: false
+    //},
     entry: path.join(__dirname, "src/main.jsx"),
     output: {
         filename: "bundle.[contenthash:12].js",
