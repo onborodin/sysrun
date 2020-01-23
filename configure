@@ -3157,7 +3157,7 @@ app_daemonize="$APP_DAEMONIZE"
 
 
 
-ac_config_files="$ac_config_files Makefile config/config.go syssrv.service"
+ac_config_files="$ac_config_files Makefile config/config.go syssrv.service init.d/sysrun"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -3903,6 +3903,7 @@ do
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
     "config/config.go") CONFIG_FILES="$CONFIG_FILES config/config.go" ;;
     "syssrv.service") CONFIG_FILES="$CONFIG_FILES syssrv.service" ;;
+    "init.d/sysrun") CONFIG_FILES="$CONFIG_FILES init.d/sysrun" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
   esac

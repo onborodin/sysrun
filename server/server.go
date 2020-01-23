@@ -11,7 +11,6 @@ import (
     "errors"
     "flag"
     "fmt"
-    //"html/template"
     "io"
     "io/ioutil"
     "log"
@@ -23,7 +22,6 @@ import (
     "strings"
     "syscall"
     "time"
-    //"crypto/tls"
 
     "github.com/gin-gonic/gin"
     "github.com/gin-contrib/sessions"
@@ -41,7 +39,6 @@ import (
 
     "sysrun/daemon"
     "sysrun/config"
-    "sysrun/bundle"
     "sysrun/tools"
 )
 
@@ -183,9 +180,6 @@ func (this *Server) Start() {
 
 func (this *Server) Run() error {
 
-    /* embedded assets init */
-    this.files = bundle.Assets.Files
-
     var err error
 
     dbUrl := fmt.Sprintf("%s", this.Config.PasswordPath)
@@ -202,12 +196,11 @@ func (this *Server) Run() error {
     }
 
     //fmt.Println("debug mode:", this.Config.Debug)
-    if this.Config.Debug{
+    if this.Config.Debug || this.Config.Devel {
         gin.SetMode(gin.DebugMode)
     } else {
         gin.SetMode(gin.ReleaseMode)
     }
-    //gin.SetMode(gin.DebugMode)
     gin.DisableConsoleColor()
 
     accessLogFile, err := os.OpenFile(this.Config.AccessLogPath, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0640)
@@ -217,7 +210,6 @@ func (this *Server) Run() error {
     gin.DefaultWriter = io.MultiWriter(accessLogFile, os.Stdout)
     //gin.DefaultWriter = ioutil.Discard
 
-
     router := gin.New()
 
     /* Dump req/res */
@@ -226,25 +218,14 @@ func (this *Server) Run() error {
         router.Use(ResponseLogMiddleware())
     }
 
-    //router.Use(gin.Logger())
+    if !this.Config.Devel && !this.Config.Debug {
+        router.Use(gzip.Gzip(gzip.DefaultCompression))
+    }
     router.Use(gin.LoggerWithFormatter(logFormatter()))
     router.Use(gin.Recovery())
-    //if !this.Config.Devel && !this.Config.Debug {
-        router.Use(gzip.Gzip(gzip.DefaultCompression))
-    //}
-    //router.MaxMultipartMemory = 1*1024*1024
 
     /* Read templates */
-    //if this.Config.Devel {
-        router.LoadHTMLGlob(filepath.Join(this.Config.LibDir, "public/index.html"))
-    //} else {
-    //    data, err := ioutil.ReadAll(this.files["/public/index.html"])
-    //    if err != nil {
-    //        return err
-    //    }
-    //    tmpl, err := template.New("index.html").Parse(string(data))
-    //    router.SetHTMLTemplate(tmpl)
-    //}
+    router.LoadHTMLGlob(filepath.Join(this.Config.LibDir, "public/index.html"))
 
     store := cookie.NewStore([]byte("ds79asd9a7d9sa7d9sa87d"))
 
@@ -281,16 +262,6 @@ func (this *Server) Run() error {
 
     router.NoRoute(this.NoRoute)
 
-    //tlsConfig := &tls.Config{
-    //    InsecureSkipVerify: true,
-    //}
-    //server := &http.Server{
-    //    Addr:         fmt.Sprintf(":%d", this.Config.Port),
-    //    Handler:      router,
-    //    TLSConfig:    tlsConfig,
-    //}
-    //err = server.ListenAndServeTLS(this.Config.CertPath, this.Config.KeyPath)
-
     err = router.RunTLS(":" + fmt.Sprintf("%d", this.Config.Port), this.Config.CertPath, this.Config.KeyPath)
     return err
 }
@@ -301,45 +272,26 @@ func (this *Server) Index(context *gin.Context) {
 
 func (this *Server) NoRoute(context *gin.Context) {
 
-
     requestPath := context.Request.URL.Path
 
-    //if this.Config.Devel {
-        /* Filesystem assets, Validate file name */
-        publicDir := filepath.Join(this.Config.LibDir, "public")
-        filePath := filepath.Clean(filepath.Join(publicDir, requestPath))
-        if !strings.HasPrefix(filePath, publicDir) {
-            err := errors.New(fmt.Sprintf("wrong file patch %s\n", filePath))
-            log.Println(err)
-            context.HTML(http.StatusOK, "index.html", nil)
-            return
-        }
+    /* Filesystem assets, Validate file name */
+    publicDir := filepath.Join(this.Config.LibDir, "public")
+    filePath := filepath.Clean(filepath.Join(publicDir, requestPath))
+    if !strings.HasPrefix(filePath, publicDir) {
+        err := errors.New(fmt.Sprintf("wrong file patch %s\n", filePath))
+        log.Println(err)
+        context.HTML(http.StatusOK, "index.html", nil)
+        return
+    }
 
-        /* for frontend handle: If file not found send index.html */
-        if !tools.FileExists(filePath) {
-            err := errors.New(fmt.Sprintf("file path not found %s\n", filePath))
-            log.Println(err)
-            context.HTML(http.StatusOK, "index.html", nil)
-            return
-        }
-        context.File(filePath)
-    //} else {
-    //    /* Embeded assests */
-    //    var err error
-    //    file := this.files[filepath.Join("/public", requestPath)] //io.Reader
-    //    if file == nil {
-    //        context.HTML(http.StatusOK, "index.html", nil)
-    //        return
-    //    }
-    //    data, err := ioutil.ReadAll(file)
-    //    if err != nil {
-    //        log.Println(err)
-    //        context.HTML(http.StatusOK, "index.html", nil)
-    //        return
-    //    }
-    //    modTime := file.ModTime()
-    //    http.ServeContent(context.Writer, context.Request, requestPath, modTime, bytes.NewReader(data))
-    //}
+    /* for frontend handle: If file not found send index.html */
+    if !tools.FileExists(filePath) {
+        err := errors.New(fmt.Sprintf("file path not found %s\n", filePath))
+        log.Println(err)
+        context.HTML(http.StatusOK, "index.html", nil)
+        return
+    }
+    context.File(filePath)
 }
 
 func logFormatter() func(param gin.LogFormatterParams) string {
@@ -489,8 +441,6 @@ func parseAuthBasicHeader(header string) (string, string, error) {
     }
     return login, pass, nil
 }
-
-
 
 func RequestLogMiddleware() gin.HandlerFunc {
     return func(context *gin.Context) {

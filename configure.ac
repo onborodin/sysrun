@@ -346,5 +346,6 @@ AC_OUTPUT([
 Makefile
 config/config.go
 syssrv.service
+init.d/sysrun
 ])
 dnl EOF
