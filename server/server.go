@@ -11,7 +11,9 @@ import (
     "errors"
     "flag"
     "fmt"
+    "html/template"
     "io"
+
     "io/ioutil"
     "log"
     "net/http"
@@ -40,6 +42,7 @@ import (
     "sysrun/daemon"
     "sysrun/config"
     "sysrun/tools"
+    "sysrun/bundle"
 )
 
 type Server struct {
@@ -64,8 +67,13 @@ func (this *Server) Start() {
     flag.BoolVar(optForeground, "f", false, "run in foreground")
 
     optPort := flag.Int("port", this.Config.Port, "listen port")
+    flag.IntVar(optPort, "p", this.Config.Port, "listen port")
+
     optDebug := flag.Bool("debug", this.Config.Debug, "debug mode")
+    flag.BoolVar(optDebug, "d", false, "debug mode")
+
     optDevel := flag.Bool("devel", this.Config.Devel, "devel mode")
+    flag.BoolVar(optDebug, "e", false, "devel mode")
 
     exeName := filepath.Base(os.Args[0])
 
@@ -182,6 +190,9 @@ func (this *Server) Run() error {
 
     var err error
 
+    /* embedded assets init */
+    this.files = bundle.Assets.Files
+
     dbUrl := fmt.Sprintf("%s", this.Config.PasswordPath)
 
     this.db, err = sqlx.Open("sqlite3", dbUrl)
@@ -225,15 +236,26 @@ func (this *Server) Run() error {
     router.Use(gin.Recovery())
 
     /* Read templates */
-    router.LoadHTMLGlob(filepath.Join(this.Config.LibDir, "public/index.html"))
 
+    if this.Config.Devel {
+        /* Filesystem variant */
+        router.LoadHTMLGlob(filepath.Join(this.Config.LibDir, "public/index.html"))
+    } else {
+        /* Embedded variant */
+        data, err := ioutil.ReadAll(this.files["/public/index.html"])
+        if err != nil {
+            return err
+        }
+        tmpl, err := template.New("index.html").Parse(string(data))
+        router.SetHTMLTemplate(tmpl)
+    }
+
+    /* Setup cookie store */
     store := cookie.NewStore([]byte("ds79asd9a7d9sa7d9sa87d"))
-
     store.Options(sessions.Options{
         MaxAge: 3600 * 4,
         Path:   "/",
     })
-
     router.Use(sessions.Sessions("session", store))
 
     router.GET("/", this.Index)
@@ -260,10 +282,11 @@ func (this *Server) Run() error {
     botGroup.POST("/vm/stop", vmController.Stop)
     botGroup.POST("/vm/shutdown", vmController.Shutdown)
 
+    botGroup.POST("/vm/dummystop", vmController.DummyStop)
+
     router.NoRoute(this.NoRoute)
 
-    err = router.RunTLS(":" + fmt.Sprintf("%d", this.Config.Port), this.Config.CertPath, this.Config.KeyPath)
-    return err
+    return router.RunTLS(":" + fmt.Sprintf("%d", this.Config.Port), this.Config.CertPath, this.Config.KeyPath)
 }
 
 func (this *Server) Index(context *gin.Context) {
@@ -274,25 +297,39 @@ func (this *Server) NoRoute(context *gin.Context) {
 
     requestPath := context.Request.URL.Path
 
-    /* Filesystem assets, Validate file name */
-    publicDir := filepath.Join(this.Config.LibDir, "public")
-    filePath := filepath.Clean(filepath.Join(publicDir, requestPath))
-    if !strings.HasPrefix(filePath, publicDir) {
-        err := errors.New(fmt.Sprintf("wrong file patch %s\n", filePath))
-        log.Println(err)
-        context.HTML(http.StatusOK, "index.html", nil)
-        return
-    }
+    if this.Config.Devel {
+        /* Filesystem assets, Validate file name */
+        publicDir := filepath.Join(this.Config.LibDir, "public")
+        filePath := filepath.Clean(filepath.Join(publicDir, requestPath))
+        if !strings.HasPrefix(filePath, publicDir) {
+            err := errors.New(fmt.Sprintf("wrong file patch %s\n", filePath))
+            log.Println(err)
+            context.HTML(http.StatusOK, "index.html", nil)
+            return
+        }
 
-    /* for frontend handle: If file not found send index.html */
-    if !tools.FileExists(filePath) {
-        err := errors.New(fmt.Sprintf("file path not found %s\n", filePath))
-        log.Println(err)
-        context.HTML(http.StatusOK, "index.html", nil)
-        return
+        /* for frontend handle: If file not found send index.html */
+        if !tools.FileExists(filePath) {
+            err := errors.New(fmt.Sprintf("file path not found %s\n", filePath))
+            log.Println(err)
+            context.HTML(http.StatusOK, "index.html", nil)
+            return
+        }
+        context.File(filePath)
+    } else {
+        /* Embedded assets variant */
+        file := this.files[filepath.Join("/public", requestPath)] //io.Reader
+        if file == nil {
+            err := errors.New(fmt.Sprintf("file path not found %s, send index", requestPath))
+            log.Println(err)
+            context.HTML(http.StatusOK, "index.html", nil)
+            return
+        }
+        http.ServeContent(context.Writer, context.Request, requestPath, file.ModTime(), file)
     }
-    context.File(filePath)
 }
+
+
 
 func logFormatter() func(param gin.LogFormatterParams) string {
     return func(param gin.LogFormatterParams) string {

@@ -91,6 +91,7 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 sbin_PROGRAMS = syssrv$(EXEEXT) syspwd$(EXEEXT)
+EXTRA_PROGRAMS = builder$(EXEEXT)
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
@@ -106,6 +107,9 @@ CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(sbindir)" "$(DESTDIR)$(etcdir)" \
 	"$(DESTDIR)$(systemddir)"
 PROGRAMS = $(sbin_PROGRAMS)
+am_builder_OBJECTS =
+builder_OBJECTS = $(am_builder_OBJECTS)
+builder_LDADD = $(LDADD)
 am_syspwd_OBJECTS =
 syspwd_OBJECTS = $(am_syspwd_OBJECTS)
 syspwd_LDADD = $(LDADD)
@@ -167,10 +171,11 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(syspwd_SOURCES) $(EXTRA_syspwd_SOURCES) $(syssrv_SOURCES) \
-	$(EXTRA_syssrv_SOURCES)
-DIST_SOURCES = $(syspwd_SOURCES) $(EXTRA_syspwd_SOURCES) \
+SOURCES = $(builder_SOURCES) $(syspwd_SOURCES) $(EXTRA_syspwd_SOURCES) \
 	$(syssrv_SOURCES) $(EXTRA_syssrv_SOURCES)
+DIST_SOURCES = $(builder_SOURCES) $(syspwd_SOURCES) \
+	$(EXTRA_syspwd_SOURCES) $(syssrv_SOURCES) \
+	$(EXTRA_syssrv_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -338,16 +343,12 @@ EXTRA_syspwd_SOURCES = \
 	server/vm-controller/vm_controller.go \
 	server/vm-model/vm_model.go
 
-EXTRA_syssrv_SOURCES = \
-	config/config.go \
-	daemon/daemon.go \
-	server/server.go \
-	server/user-controller/user_controller.go \
+EXTRA_syssrv_SOURCES = config/config.go daemon/daemon.go \
+	server/server.go server/user-controller/user_controller.go \
 	server/user-model/user_model.go \
 	server/vm-controller/vm_controller.go \
-	server/vm-model/vm_model.go \
-	tools/file.go
-
+	server/vm-model/vm_model.go tools/file.go bundle/public.go
+builder_SOURCES = builder.go
 EXTRA_DIST = README.md public/ \
 	go.mod \
 	go.sum \
@@ -883,8 +884,15 @@ uninstall-am: uninstall-nobase_etcSCRIPTS uninstall-nobase_systemdDATA \
 syssrv$(EXEEXT): $(syssrv_SOURCES) $(EXTRA_syssrv_SOURCES) builder$(EXEEXT)
 	$(GO) build -o syssrv$(EXEEXT) $(syssrv_SOURCES)
 
-syspwd$(EXEEXT): $(syspwd_SOURCES)
+syspwd$(EXEEXT): $(syspwd_SOURCES) $(EXTRA_syspwd_SOURCES)
 	$(GO) build -o syspwd$(EXEEXT) $(syspwd_SOURCES)
+
+builder$(EXEEXT): $(builder_SOURCES)
+	$(GO) build -o builder$(EXEEXT) $(builder_SOURCES)
+
+bundle/public.go: builder$(EXEEXT) public/index.html
+	test -z bundle || $(MKDIR_P) bundle
+	./builder$(EXEEXT) --package=bundle -o bundle/public.go public/
 
 clean-local:
 	rm -f builder$(EXEEXT)
@@ -892,7 +900,7 @@ clean-local:
 
 install-data-local:
 	test -z $(DESTDIR)$(APP_LIBDIR) || $(MKDIR_P) $(DESTDIR)$(APP_LIBDIR)
-	cp -r public $(DESTDIR)$(APP_LIBDIR)
+#	cp -r public $(DESTDIR)$(APP_LIBDIR)
 	test -z $(DESTDIR)$(APP_CONFDIR) || $(MKDIR_P) $(DESTDIR)$(APP_CONFDIR)
 	test -z $(DESTDIR)$(APP_LOGDIR) || $(MKDIR_P) $(DESTDIR)$(APP_LOGDIR)
 	test -z $(DESTDIR)$(APP_RUNDIR) || $(MKDIR_P) $(DESTDIR)$(APP_RUNDIR)

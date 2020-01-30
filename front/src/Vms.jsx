@@ -80,14 +80,11 @@ export class Vms extends Component {
                 <Layout>
                     <div className="container1">
                         <div className="row justify-content-between mb-3">
-
-                            <div className="col-2 d-inline-flex">
-                                    <h5>Vms</h5>
-
-                                    <div className="btn btn-primary btn-sm mx-3" onClick={this.listVms}>
-                                        <i className="fas fa-sync fa-xs"></i>
-                                    </div>
-                            </div>
+                            <h5>
+                                <i className="fas fa-server"></i>
+                                <span> VMs </span>
+                                <i className="fas fa-sync fa-xs"  onClick={this.listVms}></i>
+                            </h5>
 
                         </div>
                     </div>

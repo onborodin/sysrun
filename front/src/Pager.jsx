@@ -29,7 +29,7 @@ export class Pager extends Component {
                 const down = offset + 1
                 var up = offset + limit
                 if (up > total) { up = total }
-                return down + ":" + up
+                return down + "-" + up
             }
 
             if (pageN == 0 && pageN != currentPage ) {

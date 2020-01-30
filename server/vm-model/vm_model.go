@@ -12,6 +12,7 @@ import (
     "regexp"
     "strconv"
     "errors"
+    "time"
 )
 
 type Model struct{
@@ -71,6 +72,13 @@ func (this *Model) Stop(id int) error {
     }
     return nil
 }
+
+func (this *Model) DummyStop(id int) error {
+    time.Sleep(time.Second * 5)
+    log.Println("dummy stop vm id=", strconv.Itoa(id))
+    return nil
+}
+
 
 func (this *Model) Shutdown(id int) error {
     out, err := exec.Command("qm", "shutdown", strconv.Itoa(id)).CombinedOutput()
