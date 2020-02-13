@@ -111,21 +111,14 @@ export class Users extends Component {
         return (
             <Fragment>
                 <Layout>
-                    <div className="container1">
+                    <div className="container">
                         <div className="row justify-content-between mb-3">
-
-                            <div className="col-2 d-inline-flex">
-                                    <h5>Users</h5>
-
-                                    <div className="btn btn-primary btn-sm mx-3" onClick={this.listUsers}>
-                                        <i className="fas fa-sync fa-xs"></i>
-                                    </div>
-                            </div>
-
-                            <div className="col-1">
+                                <h5>
+                                    <i className="fas fa-users"></i>
+                                    <span> Users </span>
+                                    <i className="fas fa-sync fa-xs" onClick={this.listUsers}></i>
+                                </h5>
                                 <UserCreate updateCallback={this.listUsers}/>
-                            </div>
-
                         </div>
                     </div>
 
